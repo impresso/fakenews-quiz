@@ -27,6 +27,6 @@ RUN npm run build
 # 2. copy
 FROM busybox
 
-WORKDIR /covid
+WORKDIR /covid-19-survey-lux
 
 COPY --from=covid_builder /covid-19-survey-lux/dist ./
