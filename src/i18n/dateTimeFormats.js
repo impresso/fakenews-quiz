@@ -3,5 +3,8 @@ export default {
     year: {
       year: 'numeric',
     },
+    short: {
+      weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
+    },
   },
 };

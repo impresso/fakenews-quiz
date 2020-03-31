@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueI18n from 'vue-i18n';
-import BootstrapVue from 'bootstrap-vue';
+import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
 import App from './App.vue';
 
 import router from './router';
@@ -8,8 +8,11 @@ import store from './store';
 import messages from './i18n/messages';
 import dateTimeFormats from './i18n/dateTimeFormats';
 
+import 'bootstrap-vue/dist/bootstrap-vue-icons.min.css';
+
 Vue.config.productionTip = false;
 Vue.use(BootstrapVue);
+Vue.use(BootstrapVueIcons);
 Vue.use(VueI18n);
 
 // Create VueI18n instance with options

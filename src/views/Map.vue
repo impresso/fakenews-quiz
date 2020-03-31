@@ -7,30 +7,69 @@
     :zoom="zoom"
     :pitch="pitch"
     @load="onMapLoaded">
+
+    <div class="position-absolute width-25 m-2">
+      <b-form-input
+        id="daterange"
+        type="range"
+        v-model="day"
+        @change="updateMap()"
+        @keydown="keyhandler"
+        @keyup="keyhandler"
+        min="0" :max="days.length - 1" />
+      <b-input-group>
+        <b-input-group-prepend>
+          <b-button @click="prevDay()" :disabled="day < 1">
+            <b-icon-arrow-left />
+          </b-button>
+          <b-button @click="togglePlay()" :variant="playing ? 'danger' : 'success'">
+            <div v-if="playing">
+              <b-icon-pause />
+            </div>
+            <div v-else>
+              <b-icon-play />
+            </div>
+          </b-button>
+        </b-input-group-prepend>
+        <b-form-input type="number"
+          :value="day" v-model="day"
+          @change="updateMap()" min="0" :max="days.length - 1" style="border: none" />
+        <b-input-group-append>
+          <b-button @click="nextDay()" :disabled="day >= (days.length - 1)">
+            <b-icon-arrow-right />
+          </b-button>
+        </b-input-group-append>
+      </b-input-group>
+
+      <div class="selectedBox mt-3" :class="Object.keys(selected).length === 0 ? 'hidden' : ''">
+        <div class="label">Location</div>
+        <div class="country">
+          <span v-if="selected['Province/State'] !== ''">{{ selected['Province/State'] }}, </span>
+          {{ selected['Country/Region'] }}
+        </div>
+        <div class="label pt-2">Date</div>
+        <div class="white">
+          {{ $d(new Date(daystr), 'short') }}
+        </div>
+        <div class="label pt-2">Active Cases</div>
+        <div class="bigdata cases">
+          {{ $n(selected[daystr]) }}
+        </div>
+      </div>
+
+    </div>
+
+
   </MglMap>
-  <div>
-    <label for="daterange">Slide dates</label>
-    <b-form-input
-      id="daterange"
-      type="range"
-      v-model="sliderValue"
-      @change="changeDate()"
-      min="0" :max="dates.length - 1" />
 
-      <b-button @click="togglePlay()">
-        <span v-if="playing">Pause</span><span v-else>Play</span></b-button>
-
-    <div class="mt-2">Day: {{ sliderValue }} – Date {{ dateStr }}</div>
-  </div>
 </div>
 </template>
 
 <script>
-// import Mapbox from 'mapbox-gl';
-import {
-  MglMap,
-} from 'vue-mapbox';
+import { MglMap } from 'vue-mapbox';
 import mapboxgl from 'mapbox-gl';
+import 'bootstrap/dist/css/bootstrap.css';
+// import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 export default {
   components: {
@@ -44,10 +83,12 @@ export default {
       zoom: 3,
       pitch: 0,
       coordinates: [6.2, 49.8],
-      sliderValue: 2,
+      day: 0,
       playing: false,
       playInt: null,
-      dates: [
+      playingSpeed: 100,
+      selected: {},
+      days: [
         '1/22/20',
         '1/23/20',
         '1/24/20',
@@ -121,54 +162,80 @@ export default {
   },
   created() {
     this.map = null;
-    window.addEventListener('keypress', (e) => {
+    window.addEventListener('keyup', (e) => {
       // hit space to play !!!
       if (e.keyCode === 32) {
         this.togglePlay();
+      } else if (e.keyCode === 37) {
+        this.prevDay();
+      } else if (e.keyCode === 39) {
+        this.nextDay();
       }
+      // console.log(e.keyCode);
     });
   },
   computed: {
-    dateStr() {
-      return this.dates[this.sliderValue];
+    daystr() {
+      return this.days[this.day];
     },
   },
   methods: {
+    keyhandler() {
+      // do nothing
+    },
+    nextDay() {
+      if (this.day < (this.days.length - 1)) {
+        this.day += 1;
+        this.updateMap();
+      }
+    },
+    prevDay() {
+      if (this.day > 0) {
+        this.day -= 1;
+        this.updateMap();
+      }
+    },
+    deSelect() {
+      this.selected = {};
+    },
     togglePlay() {
       if (this.playing) {
         clearInterval(this.playInt);
         this.playing = false;
       } else {
         this.playInt = setInterval(() => {
-          this.sliderValue += 1;
-          if (this.sliderValue >= this.dates.length) {
-            this.sliderValue = 0;
+          this.day += 1;
+          if (this.day >= this.days.length) {
+            this.day = 0;
           }
-          this.changeDate();
-        }, 20);
+          this.updateMap();
+        }, this.playingSpeed);
         this.playing = true;
       }
     },
-    changeDate() {
-      // console.log(this.dateStr);
-      // this.map.setFilter('data-heat', ['get', this.dateStr]);
-      this.map.setPaintProperty('data-heat', 'heatmap-weight', ['get', this.dateStr]);
+    updateMap() {
+      // console.log(this.daystr);
+      // this.map.setFilter('data-heat', ['get', this.daystr]);
+      // console.log('---', this.daystr);
+      this.map.setPaintProperty('data-heat', 'heatmap-weight', ['get', this.daystr]);
       // this.map.setPaintProperty('data-point',
-      // 'circle-radius', 10 + ['get', this.dateStr] * 0.01);
-    },
-    day() {
-      // if (this.map.getSource('data') && this.map.isSourceLoaded('data')) {
-      //   const d = this.map.querySourceFeatures('data');
-      //   console.log('source loaded!', d);
-      //   return Object.keys(d.features[0].properties)[this.sliderValue];
-      // }
-      return '3/18/20';
+      // 'circle-radius', 10 + ['get', this.daystr] * 0.01);
+      // this.selected = {};
+      // this.selected.country = e.features[0].properties['Country/Region'];
+      // this.selected.province = e.features[0].properties['Province/State'];
+      // this.selected.activeCases = e.features[0].properties[this.daystr];
     },
     onMapLoaded(event) {
       // in component
       this.map = event.map;
       // this.map.scrollZoom.disable();
+      this.map.addControl(new mapboxgl.NavigationControl());
+      // this.map.addControl(new mapboxgl.FullscreenControl());
+      this.map.getCanvas().addEventListener('click', () => {
+        this.deSelect();
+      });
 
+      this.map.scrollZoom.disable();
       this.map.addSource('data', {
         type: 'geojson',
         data: '../data/time_series_covid19_confirmed_global.geojson',
@@ -183,7 +250,7 @@ export default {
           'heatmap-weight': [
             'interpolate',
             ['linear'],
-            ['get', this.dateStr],
+            ['get', this.daystr],
             0,
             0,
             6,
@@ -243,66 +310,60 @@ export default {
         minzoom: 0,
         paint: {
           // Size circle radius by earthquake magnitude and zoom level
-          'circle-radius': 2,
+          'circle-radius': 6,
           'circle-color': 'rgba(0,0,0,0.2)',
-          'circle-stroke-color': 'white',
+          'circle-stroke-color': 'rgba(200,200,200,0.5)',
           'circle-stroke-width': 1,
-          // Transition from heatmap to circle layer by zoom level
-          // 'circle-opacity': [
-          //   'interpolate',
-          //   ['linear'],
-          //   ['zoom'],
-          //   7,
-          //   0,
-          //   8,
-          //   1,
-          // ],
         },
       },
       'waterway-label');
 
-      // Create a popup, but don't add it to the map yet.
-      const popup = new mapboxgl.Popup({
-        closeButton: false,
-        closeOnClick: true,
-      });
       this.map.on('mouseenter', 'data-point', () => {
         this.map.getCanvas().style.cursor = 'pointer';
       });
+
       this.map.on('mouseleave', 'data-point', () => {
         this.map.getCanvas().style.cursor = '';
       });
+
       this.map.on('click', 'data-point', (e) => {
-        // Change the cursor style as a UI indicator.
-        // this.map.getCanvas().style.cursor = 'pointer';
-
-        const coordinates = e.features[0].geometry.coordinates.slice();
-        const description = `<div class="label">${e.features[0].properties['Country/Region']}</div>
-           ${this.dateStr} : <b>${e.features[0].properties[this.dateStr]} cases</b>`;
-
-        // Ensure that if the map is zoomed out such that multiple
-        // copies of the feature are visible, the popup appears
-        // over the copy being pointed to.
-        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-          coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-        }
-
-        // Populate the popup and set its coordinates
-        // based on the feature found.
-        // console.log(e.features[0].properties['3/29/20']);
-        popup
-          .setLngLat(coordinates)
-          .setHTML(description)
-          .addTo(this.map);
+        this.map.flyTo({ center: e.features[0].geometry.coordinates });
+        this.selected = e.features[0].properties;
+        // console.log(this.selected);
       });
     },
   },
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .map-container {
-    height: 75vh;
+  height: 100vh;
+}
+.hidden {
+  opacity: 0;
+  transform: scale(0.8);
+}
+.selectedBox {
+    padding: 1em;
+    color: mintcream;
+    background-color: rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.2);
+    transition: all 400ms;
+    .label {
+      font-weight: bold;
+      font-size: 65%;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #999;
+    }
+    .bigdata {
+      font-size: 300%;
+      line-height: 1;
+    }
+}
+.white {
+  color: white;
 }
 </style>
 
