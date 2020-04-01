@@ -157,6 +157,8 @@ export default {
         '3/27/20',
         '3/28/20',
         '3/29/20',
+        '3/30/20',
+        '3/31/20',
       ],
     };
   },
@@ -198,17 +200,24 @@ export default {
     deSelect() {
       this.selected = {};
     },
+    pause() {
+      clearInterval(this.playInt);
+      this.playing = false;
+    },
     togglePlay() {
       if (this.playing) {
-        clearInterval(this.playInt);
-        this.playing = false;
+        this.pause();
       } else {
+        if (this.day >= (this.days.length - 1)) {
+          this.day = 0;
+        }
         this.playInt = setInterval(() => {
-          this.day += 1;
-          if (this.day >= this.days.length) {
-            this.day = 0;
+          if (this.day >= (this.days.length - 1)) {
+            this.pause();
+          } else {
+            this.day += 1;
+            this.updateMap();
           }
-          this.updateMap();
         }, this.playingSpeed);
         this.playing = true;
       }
@@ -327,7 +336,7 @@ export default {
       });
 
       this.map.on('click', 'data-point', (e) => {
-        this.map.flyTo({ center: e.features[0].geometry.coordinates });
+        // this.map.flyTo({ center: e.features[0].geometry.coordinates });
         this.selected = e.features[0].properties;
         // console.log(this.selected);
       });
