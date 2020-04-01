@@ -1,12 +1,12 @@
 import Vue from 'vue';
 import VueI18n from 'vue-i18n';
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
-import App from './App.vue';
+import App from '@/App';
 
-import router from './router';
-import store from './store';
-import messages from './i18n/messages';
-import dateTimeFormats from './i18n/dateTimeFormats';
+import router from '@/router';
+import store from '@/store';
+import messages from '@/i18n/messages';
+import dateTimeFormats from '@/i18n/dateTimeFormats';
 
 import 'bootstrap-vue/dist/bootstrap-vue-icons.min.css';
 
