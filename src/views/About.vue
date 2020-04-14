@@ -7,7 +7,7 @@
 <i18n>
 {
   "en": {
-    "title": "COVID-19 monitoring: about"
+    "title": "Fake News Quiz: about"
   }
 }
 </i18n>
