@@ -27,7 +27,7 @@
         </a>
       </div>
     </div>
-    <h1>{{ score }}</h1>
+    <h1>Score : {{ score }}</h1>
   </div>
 </template>
 
@@ -75,6 +75,7 @@ export default {
         alert('all articles have been guessed');
         this.answered = [];
       } else {
+        this.rand = Math.floor(Math.random() * this.num_articles);
         while (this.answered.includes(this.rand)) {
           this.rand = Math.floor(Math.random() * this.num_articles);
         }
