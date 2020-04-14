@@ -48,12 +48,12 @@
           {{ selected['Country/Region'] }}
         </div>
         <div class="label pt-2">Date</div>
-        <div class="white">
-          {{ $d(new Date(daystr), 'short') }}
+        <div v-if="today && today.length > 1" class="white">
+          {{ $d(new Date(today), 'short') }}
         </div>
         <div class="label pt-2">Active Cases</div>
         <div class="bigdata cases">
-          {{ $n(selected[daystr]) }}
+          {{ $n(selected[today]) }}
         </div>
       </div>
 
@@ -68,6 +68,7 @@
 <script>
 import { MglMap } from 'vue-mapbox';
 import mapboxgl from 'mapbox-gl';
+import csv2geojson from 'csv2geojson';
 import 'bootstrap/dist/css/bootstrap.css';
 // import 'bootstrap-vue/dist/bootstrap-vue.css';
 
@@ -79,111 +80,74 @@ export default {
     return {
       accessToken: 'pk.eyJ1IjoieW91dGFnIiwiYSI6ImRSbGY4dGMifQ.8qYcIzpevfAMjHmgRDesOA',
       mapStyle: 'mapbox://styles/youtag/ck86560ex000c1ims4chreaqo',
+      dataUrl: {
+        confirmed_global: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv',
+        deaths_global: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv',
+        confirmed_US: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv',
+        deaths_US: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_US.csv',
+      },
       center: [6.1326, 49.8167],
       zoom: 3,
       pitch: 0,
       coordinates: [6.2, 49.8],
       day: 0,
+      days: [],
       playing: false,
       playInt: null,
       playingSpeed: 100,
       selected: {},
-      days: [
-        '1/22/20',
-        '1/23/20',
-        '1/24/20',
-        '1/25/20',
-        '1/26/20',
-        '1/27/20',
-        '1/28/20',
-        '1/29/20',
-        '1/30/20',
-        '1/31/20',
-        '2/1/20',
-        '2/2/20',
-        '2/3/20',
-        '2/4/20',
-        '2/5/20',
-        '2/6/20',
-        '2/7/20',
-        '2/8/20',
-        '2/9/20',
-        '2/10/20',
-        '2/11/20',
-        '2/12/20',
-        '2/13/20',
-        '2/14/20',
-        '2/15/20',
-        '2/16/20',
-        '2/17/20',
-        '2/18/20',
-        '2/19/20',
-        '2/20/20',
-        '2/21/20',
-        '2/22/20',
-        '2/23/20',
-        '2/24/20',
-        '2/25/20',
-        '2/26/20',
-        '2/27/20',
-        '2/28/20',
-        '2/29/20',
-        '3/1/20',
-        '3/2/20',
-        '3/3/20',
-        '3/4/20',
-        '3/5/20',
-        '3/6/20',
-        '3/7/20',
-        '3/8/20',
-        '3/9/20',
-        '3/10/20',
-        '3/11/20',
-        '3/12/20',
-        '3/13/20',
-        '3/14/20',
-        '3/15/20',
-        '3/16/20',
-        '3/17/20',
-        '3/18/20',
-        '3/19/20',
-        '3/20/20',
-        '3/21/20',
-        '3/22/20',
-        '3/23/20',
-        '3/24/20',
-        '3/25/20',
-        '3/26/20',
-        '3/27/20',
-        '3/28/20',
-        '3/29/20',
-        '3/30/20',
-        '3/31/20',
-      ],
+      geoJson: {},
     };
   },
   created() {
+    fetch(this.dataUrl.confirmed_global)
+      .then((response) => response.text())
+      .then((csvString) => {
+        this.days = csvString.split('\n', 1)[0].split(',').slice(4);
+        // console.log(csvString);
+        csv2geojson.csv2geojson(csvString, {
+          numericFields: this.days.join(','),
+        }, (err, data) => {
+          this.geoJson = data;
+          // populate days array
+          // Object.keys(data.features[0].properties).forEach((item) => {
+          //   if (!['Province/State', 'Country/Region'].includes(item)) {
+          //     this.days.push(item);
+          //   }
+          // });
+
+          // populate geoJson object
+          // this.geoJson = {
+          //   ...data,
+          // };
+          // data.features.forEach((feature, i) => {
+          //   this.days.forEach((day) => {
+          //     this.geoJson.features[i].properties[day] = Number(feature.properties[day]);
+          //   });
+          // });
+        });
+      });
     this.map = null;
-    window.addEventListener('keyup', (e) => {
-      // hit space to play !!!
-      if (e.keyCode === 32) {
-        this.togglePlay();
-      } else if (e.keyCode === 37) {
-        this.prevDay();
-      } else if (e.keyCode === 39) {
-        this.nextDay();
-      }
-      // console.log(e.keyCode);
-    });
+    this.keyhandler();
   },
   computed: {
-    daystr() {
+    today() {
       return this.days[this.day];
     },
   },
   methods: {
     keyhandler() {
-      // do nothing
+      window.addEventListener('keyup', (e) => {
+        // hit space to play !!!
+        if (e.keyCode === 32) {
+          this.togglePlay();
+        } else if (e.keyCode === 37) {
+          this.prevDay();
+        } else if (e.keyCode === 39) {
+          this.nextDay();
+        }
+        // console.log(e.keyCode);
+      });
     },
     nextDay() {
       if (this.day < (this.days.length - 1)) {
@@ -223,16 +187,16 @@ export default {
       }
     },
     updateMap() {
-      // console.log(this.daystr);
-      // this.map.setFilter('data-heat', ['get', this.daystr]);
-      // console.log('---', this.daystr);
-      this.map.setPaintProperty('data-heat', 'heatmap-weight', ['get', this.daystr]);
+      // console.log(this.today);
+      // this.map.setFilter('data-heat', ['get', this.today]);
+      // console.log('---', this.today);
+      this.map.setPaintProperty('data-heat', 'heatmap-weight', ['get', this.today]);
       // this.map.setPaintProperty('data-point',
-      // 'circle-radius', 10 + ['get', this.daystr] * 0.01);
+      // 'circle-radius', 10 + ['get', this.today] * 0.01);
       // this.selected = {};
       // this.selected.country = e.features[0].properties['Country/Region'];
       // this.selected.province = e.features[0].properties['Province/State'];
-      // this.selected.activeCases = e.features[0].properties[this.daystr];
+      // this.selected.activeCases = e.features[0].properties[this.today];
     },
     onMapLoaded(event) {
       // in component
@@ -247,7 +211,7 @@ export default {
       this.map.scrollZoom.disable();
       this.map.addSource('data', {
         type: 'geojson',
-        data: '../data/time_series_covid19_confirmed_global.geojson',
+        data: this.geoJson,
       });
       this.map.addLayer({
         id: 'data-heat',
@@ -259,7 +223,7 @@ export default {
           'heatmap-weight': [
             'interpolate',
             ['linear'],
-            ['get', this.daystr],
+            ['get', this.today],
             0,
             0,
             6,
@@ -310,8 +274,7 @@ export default {
             0,
           ],
         },
-      },
-      'waterway-label');
+      });
       this.map.addLayer({
         id: 'data-point',
         type: 'circle',
@@ -319,13 +282,12 @@ export default {
         minzoom: 0,
         paint: {
           // Size circle radius by earthquake magnitude and zoom level
-          'circle-radius': 6,
+          'circle-radius': 4,
           'circle-color': 'rgba(0,0,0,0.2)',
           'circle-stroke-color': 'rgba(200,200,200,0.5)',
           'circle-stroke-width': 1,
         },
-      },
-      'waterway-label');
+      });
 
       this.map.on('mouseenter', 'data-point', () => {
         this.map.getCanvas().style.cursor = 'pointer';
