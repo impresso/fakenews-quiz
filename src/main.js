@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import VueI18n from 'vue-i18n';
-import BootstrapVue from 'bootstrap-vue';
+import {
+  BootstrapVue, BIcon, BIconCheckCircle, BIconXCircle, BIconChevronLeft, BIconChevronRight,
+} from 'bootstrap-vue';
 import App from '@/App';
 
 import router from '@/router';
@@ -8,8 +10,16 @@ import store from '@/store';
 import messages from '@/i18n/messages';
 import dateTimeFormats from '@/i18n/dateTimeFormats';
 
+import 'bootstrap/dist/css/bootstrap.css';
+// import 'bootstrap-vue/dist/bootstrap-vue.css';
+
 Vue.config.productionTip = false;
 Vue.use(BootstrapVue);
+Vue.component('BIcon', BIcon);
+Vue.component('BIconCheckCircle', BIconCheckCircle);
+Vue.component('BIconXCircle', BIconXCircle);
+Vue.component('BIconChevronLeft', BIconChevronLeft);
+Vue.component('BIconChevronRight', BIconChevronRight);
 Vue.use(VueI18n);
 
 // Create VueI18n instance with options
