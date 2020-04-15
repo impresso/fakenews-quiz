@@ -1,23 +1,31 @@
 <template>
   <div class="about">
     <!-- <h1>{{ $t('title') }}</h1> -->
+    <b-alert :show="alertMessage != ''" fade>
+      <h4 class="alert-heading">Well done!</h4>
+      <hr>
+      <p>{{ alertMessage }}</p>
+      <b-button @click="resetGame()" variant="outline-info">Try again !</b-button>
+    </b-alert>
     <div class="position-absolute ml-3" style="top:-4.8em; left:0">
-      <h3 class="my-3">{{ answered.length + 1 }} / {{ num_articles }}</h3>
+      <h3 class="my-3" v-if="answered.length < num_articles">
+        {{ answered.length + 1 }} / {{ num_articles }}
+      </h3>
     </div>
     <div class="position-absolute mr-3" style="top:-4.8em; right:0">
-      <h3 class="my-3">Score : {{ score }}</h3>
+      <h3 class="my-3" v-if="answered.length < num_articles">Score : {{ score }}</h3>
     </div>
     <div class="app-container">
       <div class="controls-container">
-        <b-button-group class="my-4 w-100">
-          <b-button variant="outline-primary" @click="checkNews(false)"
+        <b-button-group class="my-3 w-100">
+          <b-button variant="outline-info" @click="checkNews(false)"
             :disabled="disableButtons">
             <b-icon icon="chevron-left"></b-icon> Fake !
           </b-button>
           <b-button variant="outline-secondary" @click="checkNews()">
             Pass !
           </b-button>
-          <b-button variant="outline-primary" @click="checkNews(true)"
+          <b-button variant="outline-info" @click="checkNews(true)"
           :disabled="disableButtons">
             Authentic ! <b-icon icon="chevron-right"></b-icon>
           </b-button>
@@ -58,10 +66,12 @@ export default {
   data: () => ({
     articles: json.articles,
     score: 0,
+    correctAnswers: 0,
     rand: 0,
     answered: [],
     showFeedback: {},
     disableButtons: false,
+    alertMessage: '',
   }),
   created() {
     this.shuffleArticles();
@@ -77,8 +87,7 @@ export default {
   methods: {
     shuffleArticles() {
       if (this.answered.length >= this.num_articles) {
-        alert('all articles have been guessed');
-        this.answered = [];
+        this.alertMessage = `You have correctly guessed ${this.correctAnswers} out of ${this.num_articles} articles.`;
       } else {
         this.rand = Math.floor(Math.random() * this.num_articles);
         while (this.answered.includes(this.rand)) {
@@ -86,6 +95,12 @@ export default {
         }
       }
       this.disableButtons = false;
+    },
+    resetGame() {
+      this.answered = [];
+      this.correctAnswers = 0;
+      this.alertMessage = '';
+      this.score = 0;
     },
     checkNews(answer) {
       // console.log(answer, this.articles[this.current_article].isFake);
@@ -99,6 +114,7 @@ export default {
         } else {
           this.showFeedback.success = true;
           this.score += 10;
+          this.correctAnswers += 1;
         }
         this.answered.push(this.rand);
       }
