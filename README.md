@@ -1,6 +1,6 @@
-# covid-19-survey-lux
+# fekenews-quiz
 
-A simple vue app to monitor covid in luxembourg
+A tinderesque vue fakenews quiz
 
 ## Project setup
 ```
