@@ -1,4 +1,4 @@
-# fekenews-quiz
+# fakenews-quiz
 
 A tinderesque vue fakenews quiz
 
