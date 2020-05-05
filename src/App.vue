@@ -5,10 +5,27 @@
       <router-link to="/about">About</router-link>
     </div>
     <router-view/>
+    <p>
+      Click <a href="#" @click.prevent="disableTracking">here</a>,
+      to disable the tracking through Google Analytics.
+    </p>
   </div>
 </template>
 
-<style lang="scss">
+<script>
+export default {
+  mounted() {
+  },
+  methods: {
+    disableTracking() {
+      this.VueAnalytics.disable();
+      alert('Tracking disabled');
+    },
+  },
+};
+</script>
+
+<style lang="css" scoped>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
