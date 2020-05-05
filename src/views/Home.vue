@@ -85,6 +85,14 @@ export default {
     },
   },
   methods: {
+    track() {
+      this.$gtag.event('action', {
+        event_category: 'cat',
+        event_label: 'label',
+        value: 'value',
+      });
+      console.log(this.$gtag.events);
+    },
     shuffleArticles() {
       if (this.answered.length >= this.num_articles) {
         this.alertMessage = `You have correctly guessed ${this.correctAnswers} out of ${this.num_articles} articles.`;
@@ -103,6 +111,7 @@ export default {
       this.score = 0;
     },
     checkNews(answer) {
+      this.track();
       // console.log(answer, this.articles[this.current_article].isFake);
       if (typeof answer === 'undefined') {
         this.shuffleArticles();
