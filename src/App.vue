@@ -5,10 +5,12 @@
       <router-link to="/about">About</router-link>
     </div>
     <router-view/>
-    <p>
-      Click <a href="#" @click.prevent="disableTracking">here</a>,
-      to disable the tracking through Google Analytics.
-    </p>
+    <footer>
+      <p class="py-3">
+        Click <a href="#" @click.prevent="disableTracking">here</a>,
+        to disable the tracking through Google Analytics.
+      </p>
+    </footer>
   </div>
 </template>
 
@@ -17,10 +19,10 @@ export default {
   mounted() {
   },
   methods: {
-    disableTracking() {
-      this.VueAnalytics.disable();
-      alert('Tracking disabled');
-    },
+    // disableTracking() {
+    //   this.$ga.disable();
+    //   alert('Tracking disabled');
+    // },
   },
 };
 </script>
