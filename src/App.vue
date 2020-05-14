@@ -24,6 +24,15 @@ export default {
     //   alert('Tracking disabled');
     // },
   },
+  watch: {
+    $route(to) {
+      document.title = to.name !== 'Home' ? `${to.name} — Fake News Quiz` : 'Fake News Quiz';
+      this.$gtag.event('screen_view', {
+        app_name: 'fakeNews',
+        screen_name: to.name,
+      });
+    },
+  },
 };
 </script>
 
