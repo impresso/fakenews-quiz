@@ -24,9 +24,9 @@ Vue.component('BIconChevronRight', BIconChevronRight);
 Vue.use(VueI18n);
 
 Vue.use(VueGtag, {
-  config: { id: 'UA-140076981-1' },
-  appName: 'Fake News',
-  pageTrackerScreenviewEnabled: true,
+  config: { id: 'UA-165584402-1' },
+  appName: 'fakenews-quiz',
+  pageTrackerScreenviewEnabled: false,
 }, router);
 
 // Create VueI18n instance with options

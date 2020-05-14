@@ -105,3 +105,4 @@ dist
 
 deployment/.env*
 !deployment/.env.example
+.DS_Store

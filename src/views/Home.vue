@@ -1,59 +1,67 @@
 <template>
   <div class="about">
-    <!-- <h1>{{ $t('title') }}</h1> -->
-    <b-alert :show="alertMessage != ''" fade>
+    <h1>{{ $t('title') }}</h1>
+    <b-alert :show="answered.length === num_articles" fade>
       <h4 class="alert-heading">Well done!</h4>
       <hr>
       <p>{{ alertMessage }}</p>
       <b-button @click="resetGame()" variant="outline-info">Try again !</b-button>
     </b-alert>
-    <div class="position-absolute ml-3" style="top:-4.8em; left:0">
-      <h3 class="my-3" v-if="answered.length < num_articles">
-        {{ answered.length + 1 }} / {{ num_articles }}
-      </h3>
-    </div>
-    <div class="position-absolute mr-3" style="top:-4.8em; right:0">
-      <h3 class="my-3" v-if="answered.length < num_articles">Score : {{ score }}</h3>
-    </div>
-    <div class="app-container">
-      <div class="controls-container">
-        <b-button-group class="my-3 w-100">
-          <b-button variant="outline-info" @click="checkNews(false)"
-            :disabled="disableButtons">
-            <b-icon icon="chevron-left"></b-icon> Fake !
-          </b-button>
-          <b-button variant="outline-secondary" @click="checkNews()">
-            Pass !
-          </b-button>
-          <b-button variant="outline-info" @click="checkNews(true)"
-          :disabled="disableButtons">
-            Authentic ! <b-icon icon="chevron-right"></b-icon>
-          </b-button>
-        </b-button-group>
-      </div>
-      <div class="articles-container">
-        <div class="date p-3">
-          {{ $d(new Date(current_article.date), 'long') }}
-        </div>
-        <h3 class="title px-4 pt-4">
-          {{ current_article.title }}
+
+    <div v-show="answered.length < num_articles">
+
+      <div class="position-absolute ml-3" style="top:-4.8em; left:0">
+        <h3 class="my-3">
+          {{ answered.length + 1 }} / {{ num_articles }}
         </h3>
-        <div class="excerpt p-4">
-          {{ current_article.excerpt }}
-        </div>
       </div>
-      <transition name="fadescale"
-        v-on:after-enter="showFeedback = {}" v-on:after-leave="shuffleArticles">
-        <div class="checkit success" v-show="showFeedback.success">
-          <b-icon icon="check-circle" font-scale="5"></b-icon>
+      <div class="position-absolute mr-3" style="top:-4.8em; right:0">
+        <h3 class="my-3">Score : {{ score }}</h3>
+      </div>
+
+      <div class="app-container">
+        <div class="controls-container">
+          <b-button-group class="my-3 w-100">
+            <b-button variant="outline-danger" @click="checkNews(false)"
+            :disabled="disableButtons">
+              <b-icon icon="chevron-left"></b-icon> Fake !
+            </b-button>
+            <b-button variant="outline-secondary" @click="checkNews()">
+              Pass !
+            </b-button>
+            <b-button variant="outline-success" @click="checkNews(true)"
+            :disabled="disableButtons">
+              Fact ! <b-icon icon="chevron-right"></b-icon>
+            </b-button>
+          </b-button-group>
         </div>
-      </transition>
-      <transition name="fadescale"
-        v-on:after-enter="showFeedback = {}" v-on:after-leave="shuffleArticles">
-        <div class="checkit fail" v-show="showFeedback.fail">
-          <b-icon icon="x-circle" font-scale="5"></b-icon>
+        <transition name="fadescale">
+        <div class="articles-container">
+          <div class="date p-3">
+            {{ $d(new Date(current_article.date), 'long') }}
+          </div>
+          <h3 class="title px-4 pt-4">
+            {{ current_article.title }}
+          </h3>
+          <div class="excerpt p-4">
+            {{ current_article.excerpt }}
+          </div>
         </div>
-      </transition>
+        </transition>
+
+        <transition name="fadescale"
+          v-on:after-enter="showFeedback = {}" v-on:after-leave="shuffleArticles">
+          <div class="checkit success" v-show="showFeedback.success">
+            <b-icon icon="check-circle" font-scale="5"></b-icon>
+          </div>
+        </transition>
+        <transition name="fadescale"
+          v-on:after-enter="showFeedback = {}" v-on:after-leave="shuffleArticles">
+          <div class="checkit fail" v-show="showFeedback.fail">
+            <b-icon icon="x-circle" font-scale="5"></b-icon>
+          </div>
+        </transition>
+      </div>
     </div>
   </div>
 </template>
@@ -86,12 +94,12 @@ export default {
   },
   methods: {
     track(correctAnswer) {
-      this.$gtag.event('action', {
-        event_category: 'question',
-        event_label: this.current_article,
-        value: correctAnswer,
+      this.$gtag.event('answer', {
+        event_category: correctAnswer ? 'correct' : 'wrong',
+        event_label: this.current_article.title,
+        value: +correctAnswer,
       });
-      console.log(this.$gtag);
+      // console.log(+correctAnswer);
     },
     shuffleArticles() {
       if (this.answered.length >= this.num_articles) {
@@ -116,7 +124,7 @@ export default {
         this.shuffleArticles();
       } else {
         this.disableButtons = true;
-        this.track(answer === this.current_article.isFake);
+        this.track(answer !== this.current_article.isFake);
         if (answer === this.current_article.isFake) {
           this.showFeedback.fail = true;
           this.score -= 5;
@@ -140,12 +148,16 @@ export default {
     max-width: 40rem;
     margin: auto;
   }
+  .btn:not(:hover) {
+    background-color: white;
+  }
   .app-container {
     position: relative;
     border: 2px solid #white;
     .articles-container {
-      background-color: #eee;
-      border: 2px inset rgba(0,0,0,0.2);
+      background-color: #fff;
+      border: 1px solid #2c3e5066;
+      border-radius: 4px;
       overflow: hidden;
       .date {
         text-transform: uppercase;
@@ -200,7 +212,7 @@ export default {
 <i18n>
 {
   "en": {
-    "title": "Fake articles Quiz: home"
+    "title": "Fakt or Fake ?"
   }
 }
 </i18n>
