@@ -85,13 +85,13 @@ export default {
     },
   },
   methods: {
-    track() {
+    track(correctAnswer) {
       this.$gtag.event('action', {
-        event_category: 'cat',
-        event_label: 'label',
-        value: 'value',
+        event_category: 'question',
+        event_label: this.current_article,
+        value: correctAnswer,
       });
-      console.log(this.$gtag.events);
+      console.log(this.$gtag);
     },
     shuffleArticles() {
       if (this.answered.length >= this.num_articles) {
@@ -111,12 +111,12 @@ export default {
       this.score = 0;
     },
     checkNews(answer) {
-      this.track();
       // console.log(answer, this.articles[this.current_article].isFake);
       if (typeof answer === 'undefined') {
         this.shuffleArticles();
       } else {
         this.disableButtons = true;
+        this.track(answer === this.current_article.isFake);
         if (answer === this.current_article.isFake) {
           this.showFeedback.fail = true;
           this.score -= 5;
