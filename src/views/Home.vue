@@ -23,24 +23,23 @@
       <b-button @click="resetGame()" variant="outline-info">Play again !</b-button>
     </b-alert>
 
-    <div class="controls-container">
-      <b-button-group class="w-100">
-        <b-button variant="outline-danger" @click="checkNews(false)"
-        :disabled="disableButtons">
-          <b-icon icon="chevron-left"></b-icon> &nbsp; &nbsp; Fake
-        </b-button>
-        <b-button variant="outline-secondary" @click="checkNews()">
-          Pass
-        </b-button>
-        <b-button variant="outline-success" @click="checkNews(true)"
-        :disabled="disableButtons">
-          Fact &nbsp; &nbsp; <b-icon icon="chevron-right"></b-icon>
-        </b-button>
-      </b-button-group>
-    </div>
-
     <div v-show="answered.length < num_articles">
 
+      <div class="controls-container">
+        <b-button-group class="w-100">
+          <b-button variant="outline-danger" @click="checkNews(false)"
+          :disabled="disableButtons">
+            <b-icon icon="chevron-left"></b-icon> &nbsp; &nbsp; Fake
+          </b-button>
+          <b-button variant="outline-secondary" @click="checkNews()">
+            Pass
+          </b-button>
+          <b-button variant="outline-success" @click="checkNews(true)"
+          :disabled="disableButtons">
+            Fact &nbsp; &nbsp; <b-icon icon="chevron-right"></b-icon>
+          </b-button>
+        </b-button-group>
+      </div>
       <div class="app-container">
 
         <div class="articles-container">
@@ -209,6 +208,7 @@ export default {
         column-rule: 1px solid rgba(110,100,90,.8);
         text-align: left;
         font-size: 2.35vmin;
+        max-height: 48vmin;
         // border: 1px dotted green;
         // height: 100%;
         // line-height: 1.4em;
