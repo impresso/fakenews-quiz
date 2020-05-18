@@ -1,15 +1,28 @@
 <template>
   <div id="app">
+
     <div id="nav">
-      <router-link to="/">Home</router-link> |
+      <router-link to="/">Quiz</router-link> |
       <router-link to="/about">About</router-link>
     </div>
+
     <router-view/>
-    <footer>
-      <!-- <p class="py-3">
-        Click <a href="#" @click.prevent="disableTracking">here</a>,
-        to disable the tracking through Google Analytics.
-      </p> -->
+
+    <footer class="mt-5">
+      <b-container class="bv-example-row">
+        <b-row align-v="center">
+          <b-col sm="12" md="8">
+          </b-col>
+          <b-col sm="12" md="4">
+            <a href="https://impresso-project.ch/">
+              <img src="https://impresso-project.ch/assets/images/logo-mobile.png"
+                width="100%" alt="Impresso Logo">
+            </a>
+          </b-col>
+        </b-row>
+      </b-container>
+      <p>
+      </p>
     </footer>
   </div>
 </template>
@@ -20,10 +33,6 @@ export default {
     document.title = this.$t('title');
   },
   methods: {
-    // disableTracking() {
-    //   this.$ga.disable();
-    //   alert('Tracking disabled');
-    // },
   },
   watch: {
     $route(to) {
@@ -38,28 +47,39 @@ export default {
 </script>
 
 <style lang="scss">
+@import url('https://fonts.googleapis.com/css?family=Libre+Caslon+Text:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Dosis:wght@523&display=swap');
 body {
-  background-color: #2c3e5011 !important;
+  background-color: #eeeced !important;
 }
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: 'Lato', sans-serif;
   text-align: center;
-  color: #2c3e50;
+  color: #51484d;
+  height: 100vh;
+}
+
+footer {
+  background: #000;
+  color: white;
 }
 
 #nav {
+  background: white;
   padding: 30px;
-
   a {
     font-weight: bold;
-    color: #2c3e50;
-
+    color: #151515;
+    text-transform: uppercase;
+    padding: 0.1em  0.4em;
     &.router-link-exact-active {
-      color: #17a2b8;
+      // color: #17a2b8;
+      background: yellow;
     }
   }
+}
+.serif {
+  font-family: 'Libre Caslon Text', serif;
 }
 </style>
 
