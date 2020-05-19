@@ -11,13 +11,15 @@
     <footer class="mt-5">
       <b-container class="bv-example-row">
         <b-row align-v="center">
-          <b-col sm="12" md="8">
+          <b-col sm="3" md="4">
           </b-col>
-          <b-col sm="12" md="4">
+          <b-col sm="6" md="4">
             <a href="https://impresso-project.ch/">
               <img src="https://impresso-project.ch/assets/images/logo-mobile.png"
                 width="100%" alt="Impresso Logo">
             </a>
+          </b-col>
+          <b-col sm="3" md="4">
           </b-col>
         </b-row>
       </b-container>
